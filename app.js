@@ -1,3 +1,67 @@
+
+
+//secret key to sig
+
+function findUserByID(userID){
+	for(user of users)
+	{
+		if(user.userID == userID) return user;
+	}
+	return null;
+}
+
+let port = 8000;
+
+//dependecies
+const express = require('express');
+const morgan = require('morgan');
+const jwt = require('jsonwebtoken');
+const path = require('path');
+
+const app = express();
+
+app.use(morgan('dev'));
+
+let publicPath = path.resolve(__dirname,"public");
+app.use(express.static(publicPath));
+
+app.post("/login" ,(req,res) =>{
+	let user = authenticateUser(req.body.username,req.body.password);
+	if(user.error)
+	{
+		res.statusCode(403)
+		res.send(`<h3>Error: ${user.error} </h3>`)
+	}
+	else
+	{
+		res.send(user);
+	}
+})
+
+//if username is correct, returns user and password , other
+function authenticateUser(username,password)
+{
+	let user = findUserByID(username);
+	if(user)
+	{
+		if(user.password == password)
+		{
+			return user;
+		}
+		else
+		{
+			return {error: "Incorrect Password"}
+		}
+	}
+	return null;
+}
+
+
+
+
+app.listen(port, () => console.log("Server listening on port:" + 8000));
+
+
 //sample user databse
 let users = [
 	{userID:1, username: "af123" ,full_name:"Andrew Friend",password:"Password"},
@@ -7,38 +71,22 @@ let users = [
 	{userID:5, username: "rp567" ,full_name:"Ryan Patrick", password:"Password"}
 ];
 
+//functions for finding users
 
-
-//secret key to sign tokens
-let secretkey = "thisIsAnInsecureKey";
-
-//port to run sever on
-const port = 8000;
-
-//dependecies
-const express = require('express');
-const morgan = require('morgan');
-const jwt = require('jsonwebtoken');
-
-const app = express();
-
-app.use(express.urlencoded());
-app.use(express.json());
-
-app.post("/login" ,(req,res) =>{
-	user
-})
-
-//if username is correct, returns user and password , other
-function authenticateUser(username,password)
-{
-
+//by id
+function findUserByID(userID){
+	for(user of users)
+	{
+		if(user.userID == userID) return user;
+	}
+	return null;
 }
 
-function verifyToken(req,res,next){
-
+//by username
+function findUserByID(username){
+	for(user of users)
+	{
+		if(user.username == username) return user;
+	}
+	return null;
 }
-
-app.listen(port, () => console.log("Server listening on port:" + 8000));
-
-
