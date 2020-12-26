@@ -21,6 +21,8 @@ const path = require('path');
 const app = express();
 
 app.use(morgan('dev'));
+app.use(express.urlencoded());
+app.use(express.json())
 
 let publicPath = path.resolve(__dirname,"public");
 app.use(express.static(publicPath));
@@ -29,7 +31,7 @@ app.post("/login" ,(req,res) =>{
 	let user = authenticateUser(req.body.username,req.body.password);
 	if(user.error)
 	{
-		res.statusCode(403)
+		res.status(403)
 		res.send(`<h3>Error: ${user.error} </h3>`)
 	}
 	else
@@ -53,7 +55,7 @@ function authenticateUser(username,password)
 			return {error: "Incorrect Password"}
 		}
 	}
-	return null;
+	return {error: "Incorrect Username"};
 }
 
 
