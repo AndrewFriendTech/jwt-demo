@@ -1,15 +1,7 @@
 
 
-//secret key to sig
-
-function findUserByID(userID){
-	for(user of users)
-	{
-		if(user.userID == userID) return userconsole.log(req.rawHeaders);;
-	}
-	return null;
-}
-
+//secret key to sign 
+let secretkey = "ThisKeyIsNotVerySecure"
 let port = 8000;
 
 //dependecies
@@ -39,7 +31,7 @@ app.post("/login" ,(req,res) =>{
 	}
 	else
 	{
-		jwt.sign(user, 'secretkey', { expiresIn: '30m' }, (err, token) => {
+		jwt.sign(user, secretkey, { expiresIn: '30m' }, (err, token) => {
 			res.json({
 			  token,
 			  user
@@ -47,6 +39,11 @@ app.post("/login" ,(req,res) =>{
 		});
 	}
 })
+
+app.get("/users", verifyToken, (req,res) => {
+	res.send({users, token: req.authData});
+});
+
 
 //if username is correct, returns user and password , other
 function authenticateUser(username,password)
@@ -71,6 +68,41 @@ function authenticateUser(username,password)
 
 app.listen(port, () => console.log("Server listening on port:" + 8000));
 
+//middleware to verify JWT. Adds token to request object if valid, other respons with 403
+function verifyToken(req, res, next) {
+	// Get auth header value
+	const bearerHeader = req.headers['authorization'];
+	// Check if bearer is undefined
+	if(typeof bearerHeader !== 'undefined') {
+	  // Split at the space
+	  const bearer = bearerHeader.split(' ');
+	  // Get token from array
+	  const bearerToken = bearer[1];
+	  // Set the token
+	  req.token = bearerToken;
+	  //check token is valid
+	  jwt.verify(bearerToken,secretkey,(err,data) =>{
+		  if(err)
+		  {
+			res.status(403);
+			res.send({error: "No token in header"});
+		  }
+		  else
+		  {
+			  req.authData = data;
+			  next();
+		  }
+	  })
+	  // Next middleware
+	  //next();
+	} else {
+	  // Forbidden
+	  res.status(403);
+	  res.send({error: "No token in header"});
+	}
+  
+  }
+
 
 //sample user databse
 let users = [
@@ -80,6 +112,7 @@ let users = [
 	{userID:4, username: "jo234", full_name:"Jessie Owens", password:"Password"},
 	{userID:5, username: "rp567" ,full_name:"Ryan Patrick", password:"Password"}
 ];
+
 
 //functions for finding users
 

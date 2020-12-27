@@ -4,23 +4,66 @@
 		<script src = "scripts/fetch-functions.js"></script>
 		<script>
 			window.onload= function(){
-				document.getElementById("submit").onclick = function(){
+				document.getElementById("submit").onclick = verifyLogin;
+				document.getElementById("private").onclick = getUsers;
+			};
+
+			function getUsers()
+			{
+				let token = window.localStorage.getItem('token');
+				let output = document.getElementById("user-output");
+				if(token)
+				{
+					getObjWithToken('/users',token ,(object) =>{
+						console.log(object)
+						if(object.users)
+						{
+							let content = `<h3>Your Token is:</h3>
+								<pre><code>${JSON.stringify(object.token)}</code></pre>
+								<h3>The Users in the database are:</h3>`;
+
+							for(user of object.users){
+								content += `
+								<div class = "user">
+									<code class = "user">${JSON.stringify(user)}</code>
+									</div> `;
+							}
+							output.innerHTML = content;
+							
+						}
+						else if(object.error)
+						{
+							object.innerHTML = `<h4>Error:${object.error}</h4>`
+						}
+						else
+						{
+							object.innerHTML = `<h4>Error:Some other error</h4>`
+						}
+						
+					}
+					)
+				}
+			}
+			function verifyLogin()
+			{
 					let username = document.getElementById("username").value;
 					let password = document.getElementById("password").value;
 					postObj('/login',{username,password},(data)=>{
 						if(data.error)
 						{
-							document.getElementById("output").innerHTML = `<h4>${data.error}</h4>`;
+							document.getElementById("login-output").innerHTML = `<h4>${data.error}</h4>`;
 						}
 						else if(data.user && data.token)
 						{
-							document.getElementById("output").innerHTML = 
-								`<h4>Hello ${data.user.full_name}, your bearer token is 
+							document.getElementById("login-output").innerHTML = 
+								`<h4>Hellobody: ${data.user.full_name}, your bearer token is 
 									 </h4>
 									 <p>${JSON.stringify(data.token)} </p>
 
+									}
 
 								`
+							window.localStorage.setItem("token",data.token);
 						}
 						else
 						{
@@ -28,7 +71,7 @@
 						}
 					})
 				}
-			};
+			
 		</script>
 	</head>
 	<body>
@@ -36,9 +79,15 @@
 		<input type="text" id = "username" name="username">
 		<input type="password" id = "password" name ="password">
 		<button id = "submit">Submit</button>
-		<div id = "output" style="word-wrap: break-word ;">
+		<div id = "login-output" style="word-wrap: break-word ;">
 
 		</div>
+		<br>
+		<button id = "private">Acsesses private user information</button>
+		<div id = "user-output">
+
+		</div>
+
 		</form>
 	</body>
 </html>
