@@ -31,8 +31,8 @@ app.post("/login" ,(req,res) =>{
 	let user = authenticateUser(req.body.username,req.body.password);
 	if(user.error)
 	{
-		res.status(403)
-		res.send(`<h3>Error: ${user.error} </h3>`)
+		res.status(401)
+		res.send(user)
 	}
 	else
 	{
