@@ -36,7 +36,12 @@ app.post("/login" ,(req,res) =>{
 	}
 	else
 	{
-		res.send(user);
+		jwt.sign(user, 'secretkey', { expiresIn: '30m' }, (err, token) => {
+			res.json({
+			  token,
+			  user
+			});
+		});
 	}
 })
 
