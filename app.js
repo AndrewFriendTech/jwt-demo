@@ -20,7 +20,7 @@ const path = require('path');
 
 const app = express();
 
-app.use(morgan('dev'));
+app.use(morgan('combined'));
 app.use(express.urlencoded());
 app.use(express.json())
 
