@@ -1,13 +1,44 @@
 <html>
 	<head>
 		<title>Login Page</title>
-		<script src = "scripts/fetchfunctions.js"></script>
+		<script src = "scripts/fetch-functions.js"></script>
+		<script>
+			window.onload= function(){
+				document.getElementById("submit").onclick = function(){
+					let username = document.getElementById("username").value;
+					let password = document.getElementById("password").value;
+					postObj('/login',{username,password},(data)=>{
+						if(data.error)
+						{
+							document.getElementById("output").innerHTML = `<h4>${data.error}</h4>`;
+						}
+						else if(data.user && data.token)
+						{
+							document.getElementById("output").innerHTML = 
+								`<h4>Hello ${data.user.full_name}, your bearer token is 
+									 </h4>
+									 <p>${JSON.stringify(data.token)} </p>
+
+
+								`
+						}
+						else
+						{
+							document.getElementById('output').innerHTML = "<h4> some other error</h4>";
+						}
+					})
+				}
+			};
+		</script>
 	</head>
 	<body>
 		<form id = "login" action="javascript:void(0);">
 		<input type="text" id = "username" name="username">
 		<input type="password" id = "password" name ="password">
 		<button id = "submit">Submit</button>
+		<div id = "output" style="word-wrap: break-word ;">
+
+		</div>
 		</form>
 	</body>
 </html>
