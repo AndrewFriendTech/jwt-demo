@@ -5,7 +5,7 @@
 function findUserByID(userID){
 	for(user of users)
 	{
-		if(user.userID == userID) return user;
+		if(user.userID == userID) return userconsole.log(req.rawHeaders);;
 	}
 	return null;
 }
@@ -17,15 +17,18 @@ const express = require('express');
 const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const logHeaders = require('./logHeaders');
 
 const app = express();
 
-app.use(morgan('combined'));
+app.use(morgan('dev'));
+app.use(logHeaders);
 app.use(express.urlencoded());
-app.use(express.json())
+app.use(express.json());
 
 let publicPath = path.resolve(__dirname,"public");
 app.use(express.static(publicPath));
+
 
 app.post("/login" ,(req,res) =>{
 	let user = authenticateUser(req.body.username,req.body.password);
